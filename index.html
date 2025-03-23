@@ -3,8 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta naem="viewport" content="width=device-width, initial-scale=1.0">
-        <title> Kopi Talk </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> Latté Luxe </title>
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,25 +15,99 @@
 
         <!--my style-->
         <link rel="stylesheet" href="style.css">
+
+        <!--alpine js-->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+        <!--app-->
+        <script src="app.js" async></script>
+        <script type="text/javascript"
+        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="SB-Mid-client-DJCRKHod1d3yCLhg"></script>
     </head>
     <body>
 
         <!--Navbar-->
-        <nav class="navbar">
-            <a href="#" class="navbar-logo"> Kopi<span>Talk</span>.</a>
+        <nav class="navbar" x-data>
+            <a href="#" class="navbar-logo"> Latté<span>Luxe</span>.</a>
 
             <div class="navbar-nav">
                 <a href="#home"> Home </a>
                 <a href="#about"> Tentang Kami </a>
-                <a href="#menu"> Menu </a>
+                 <a href="#menu"> Menu </a>
+                 <a href="#products"> Produk </a>
                 <a href="#contact"> Kontak </a>          
             </div>
 
             <div class="navbar-extra">
-                <a href="#" id="search"> <i data-feather="search"></i></a>
-                <a href="#" id="shopping-cart"> <i data-feather="shopping-cart"></i></a>
+                <a href="#" id="search-button"> <i data-feather="search"></i></a>
+                <a href="#" id="shopping-button"> 
+                    <i data-feather="shopping-cart"></i>
+                    <span class="quantity-badge" x-text="$store.cart.quantity"></span>
+                </a>
                 <a href="#" id="hamburger-menu"> <i data-feather="menu"></i></a>
             </div>
+
+        <!--Search-->
+        <div class="search-form">
+            <input type="search" id="search-box" placeholder="search here..">
+            <label for="search-box"><i data-feather="search"></i></label>
+        </div>
+        
+        <!--Shopping cart-->
+         
+        <div class="shopping-cart">
+            <template x-for="(item, index) in items" :key="index">
+            <div class="cart-item"> 
+                <img :src="'Menu Kopi Talk 2/' + item.img" :alt="item.name">
+                <div class="item-detail">
+                    <h3 x-text="item.name"></h3>
+                    <div class="item-price"> </div>
+                    <span x-text="rupiah(item.price)"></span> &times;
+                    <button id="remove" @click="$store.cart.remove(item.id)">&minus;</button>
+                    <span x-text="item.quantity"></span>
+                    <button id="add" @click="$store.cart.add(item)">&plus;</button> &equals;
+                    <span x-text="rupiah(item.total)"></span>
+                </div>
+            </div>
+        </template>
+        <h4 x-show="!$store.cart.items.length"> shopping cart is empty </h4>
+        <h4 x-show="$store.cart.items.length"> Total : <span x-text="rupiah($store.cart.total)"></span></h4>
+
+        <div class="form-container" x-show="$store.cart.items.length">
+    <form action="" id="checkoutform">
+        <input type="hidden" name="cart_items" x-model="JSON.stringify($store.cart.items)">
+        <input type="hidden" name="cart_total" x-model="$store.cart.total">            
+        <h5>Customer</h5>
+
+        <label for="name">
+            <span>Name</span>
+            <input type="text" name="name" placeholder="name" required>
+        </label>
+        <label for="email">
+            <span>Email</span>
+            <input type="email" name="email" placeholder="email" required>
+        </label>
+        <label for="phone">
+            <span>Phone</span>
+            <input type="number" name="phone" placeholder="phone" required>
+        </label>
+
+        <!-- Dropdown Metode Pembayaran -->
+        <label for="payment-method">
+            <span>Metode Pembayaran</span>
+            <select id="payment-method" name="payment_method" required>
+                <option value="">Pembayaran</option>
+                <option value="whatsapp">WhatsApp Checkout</option>
+         </select>
+        </label>
+
+        <div class="form-container">
+            <button class="checkout-button disabled" type="submit" id="checkout-button">Checkout</button>
+        </div>            
+    </form>
+</div>
+
         </nav>
         <!--Navbar end-->
 
@@ -41,8 +115,7 @@
         <section class="hero" id="home">
             <main class="content">
                 <h1> Mari kita nikmati <span> Kopi </span></h1>
-                <p> Lorem  dolot sit  amet</p>
-                <a href="#" class="cta"> Beli </a>
+                <p> Ada harga ada kualitas! </p>
             </main>
         </section>
 
@@ -51,7 +124,7 @@
             <h2><span> Tentang </span> Kami </h2>
             <div class="row">
                 <div class="about-img">
-                <img src="dani-ZLqxSzvVr7I-unsplash.jpg" alt= "Tentang Kami">
+                <img src="Menu Kopi Talk/dani-ZLqxSzvVr7I-unsplash.jpg" alt= "Tentang Kami">
                 </div>
                 <div class="content">
                     <h3> Coffelatte </h3>
@@ -62,30 +135,133 @@
         <!--Menu section start-->
         <section id="menu" class="menu">
         <h2><span> Menu </span> Kami </h2>
-        <p> Berikut adalah menu-menu di Kopi Talk dengan berbagai macam kopi dan serta tersedia makanan </p>
+        <p> Berikut adalah menu-menu di Latté Luxe dengan berbagai macam kopi dan serta tersedia makanan </p>
         
         <div class="row">
         <div class="menu-card">
-        <img src="Menu Kopi Talk/nuttawut-anek-vgNU1ujE8Mk-unsplash.jpg" alt="Espresso" class="menu-card-img">
-        <h3 class="menu-card-title"> Espresso </h3>
-        <p class="menu-card-price"> Idr 17k </p>
+        <img src="Menu Kopi Talk/amirali-mirhashemian-sc5sTPMrVfk-unsplash.jpg" alt="Espresso" class="menu-card-img">
+        <h3 class="menu-card-title"> Burger </h3>
+        <p class="menu-card-price"> Idr 15k </p>
         </div>
         <div class="menu-card">
-        <img src="Menu Kopi Talk/nuttawut-anek-vgNU1ujE8Mk-unsplash.jpg" alt="Espresso" class="menu-card-img">
-        <h3 class="menu-card-title"> Cappucino </h3>
+        <img src="Menu Kopi Talk/aurela-redenica-R2BrrSjOQps-unsplash.jpg" alt="Espresso" class="menu-card-img">
+        <h3 class="menu-card-title"> Ice Cream </h3>
+        <p class="menu-card-price"> Idr 10k </p>
+        </div>
+        <div class="menu-card">
+        <img src="Menu Kopi Talk/keith-brian-de-leon-1EV6hDgDpFM-unsplash.jpg" alt="Espresso" class="menu-card-img">
+        <h3 class="menu-card-title"> Caramel Macchiato </h3>
         <p class="menu-card-price"> Idr 28k </p>
         </div>
         <div class="menu-card">
-        <img src="Menu Kopi Talk/nuttawut-anek-vgNU1ujE8Mk-unsplash.jpg" alt="Espresso" class="menu-card-img">
-        <h3 class="menu-card-title"> Americano </h3>
-        <p class="menu-card-price"> Idr 25k </p>
-        </div>
-        <div class="menu-card">
-        <img src="Menu Kopi Talk/nuttawut-anek-vgNU1ujE8Mk-unsplash.jpg" alt="Espresso" class="menu-card-img">
-        <h3 class="menu-card-title"> Caramel Latte</h3>
+        <img src="Menu Kopi Talk/food-photographer-jennifer-pallian-QsGtVwWStI8-unsplash.jpg" alt="Espresso" class="menu-card-img">
+        <h3 class="menu-card-title"> Bread </h3>
         <p class="menu-card-price"> Idr 20k </p>
         </div>
         </div>
+    </section>
+
+    <!--Product section start-->
+    <section class="products" id="products" x-data="dropdown">
+    <h2><span> Produk Unggulan </span> Kami </h2>
+    <P> Tersedia produk unggulan kami </P>
+    
+    <div class="row">
+        <template x-for="(item, index) in items" x-key="index">
+        <div class="products-cards">
+        <div class="products-icons">
+            <a href="#" @click.prevent="$store.cart.add(item)">
+                <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <use href="Feather/feather-sprite.svg#shopping-cart"></use>
+              </svg>
+              </a>
+            <a href="#" class="item-detail-button">
+                <svg
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <use href="Feather/feather-sprite.svg#eye "></use>
+              </svg>
+            </a>
+        </div>
+        <div class="products-image">
+            <img :src="`Menu Kopi Talk 2/${item.img}`" :alt="item.name">
+        </div>
+        <div class="products-content">
+            <h3 x-text="item.name"> </h3>
+            <div class="product-stars">
+                <svg
+                width="24"
+                height="24"
+                fill="currentColor"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <use href="Feather/feather-sprite.svg#star"></use>
+              </svg>
+              <svg
+              width="24"
+              height="24"
+              fill="currentColor"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <use href="Feather/feather-sprite.svg#star"></use>
+            </svg> <svg
+            width="24"
+            height="24"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <use href="Feather/feather-sprite.svg#star"></use>
+          </svg> <svg
+          width="24"
+          height="24"
+          fill="currentColor"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <use href="Feather/feather-sprite.svg#star"></use>
+        </svg> <svg
+        width="24"
+        height="24"
+        fill="currentColor"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <use href="Feather/feather-sprite.svg#star"></use>
+      </svg>
+            </div>
+            <div class="products-price"><span x-text="rupiah (item.price)"></span>
+            </div>
+             </div>
+        </div>
+    </template>
+    </div>
     </section>
 
     <!--Contact section start-->
@@ -118,7 +294,7 @@
        <!--Footer-->
        <footer>
         <div class="social">
-            <a href="#"><i data-feather="instagram"></i></a>
+         <a href="https://www.instagram.com/mfahmiii._"><i data-feather="instagram"></i></a>
         </div>
 
         <div class="links">
@@ -126,20 +302,59 @@
            <a href="#about"> Tentang Kami </a>
            <a href="#menu"> Menu </a>
            <a href="#contact"> Kontak Kami </a>
+           <a href="#products"> Produk </a>
         </div>
 
         <div class="credit">
             <p> Created by <a href=""> Fahmi. </a>| &copy; 2025</p>
         </div>
        </footer>
+       
+       <!--Modal box item-->
+       <div class="modal" id="item-modal"> 
+        <div class="modal-container">
+            <a href="#" class="close-icon"><i data-feather="x"></i></a>
+            <div class="modal-content">
+                <img src="Menu Kopi Talk/muh-yusuf-syahputra-jqYEZxU5Sxo-unsplash.jpg" alt="Product1">
+                <div class="product-content">
+                    <h3>Product1</h3>
+                    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Veritatis, nesciunt. Id consequuntur vel hic possimus nihil! Cumque ipsam iure odit iste. Expedita unde dicta eos ratione facilis sint vitae cupiditate.</p>
+                    <div class="products-stars">
+                        <i data-feather="star" class="starsss"></i> 
+                        <i data-feather="star" class="starsss"></i> 
+                        <i data-feather="star" class="starsss"></i> 
+                        <i data-feather="star" class="starsss "></i> 
+                        <i data-feather="star" class="starsss"></i>
+                     </div>
+                     <div class="products-price"> 20k
+                     </div>
+                     <a href="#"><i data-feather="shopping-cart"></i> <span>add to cart</span></a>
+                </div>
+            </div>
+        </div>
+       </div>
 
+      <!-- Tambahkan Feather Icons di dalam <head> -->
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+</head>
 
-       <!--Feather icon-->
-       <script>
-        feather.replace();
-       </script>
+    <!-- Feather Icons -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        if (typeof feather !== "undefined") {
+          feather.replace();
+        } else {
+          console.error("Feather Icons gagal dimuat.");
+        }
+      });
+    </script>
+
+</body>
+</html>
+
        
  <!--Javascript-->
  <script src="script.js"></script>
-    </body>
+</body>
 </html>
