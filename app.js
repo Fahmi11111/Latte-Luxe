@@ -3,8 +3,8 @@ document.addEventListener("alpine:init", () => {
     items: [
       { id: 1, name: "Burger", img: "5.jpg", price: 15000 },
       { id: 2, name: "Ice Cream", img: "6.jpg", price: 10000 },
-      { id: 3, name: "Caramel Macchiato", img: "7.jpg", price: 28000 },
-      { id: 4, name: "Bread", img: "8.jpg", price: 20000 },
+      { id: 3, name: "Caramel Macchiato", img: "8.jpg", price: 28000 },
+      { id: 4, name: "Bread", img: "7.jpg", price: 20000 },
     ],
   }));
 
