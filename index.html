@@ -53,62 +53,145 @@
             <input type="search" id="search-box" placeholder="search here..">
             <label for="search-box"><i data-feather="search"></i></label>
         </div>
-        
-        <!--Shopping cart-->
-         
-        <div class="shopping-cart">
-            <template x-for="(item, index) in items" :key="index">
-            <div class="cart-item"> 
-                <img :src="'Menu Kopi Talk 2/' + item.img" :alt="item.name">
-                <div class="item-detail">
-                    <h3 x-text="item.name"></h3>
-                    <div class="item-price"> </div>
-                    <span x-text="rupiah(item.price)"></span> &times;
-                    <button id="remove" @click="$store.cart.remove(item.id)">&minus;</button>
-                    <span x-text="item.quantity"></span>
-                    <button id="add" @click="$store.cart.add(item)">&plus;</button> &equals;
-                    <span x-text="rupiah(item.total)"></span>
-                </Latté Luxediv>
-            </div>
-        </template>
-        <h4 x-show="!$store.cart.items.length"> shopping cart is empty </h4>
-        <h4 x-show="$store.cart.items.length"> Total : <span x-text="rupiah($store.cart.total)"></span></h4>
+       <!-- Shopping Cart -->
+<div class="shopping-cart p-4 bg-gray-900 text-white rounded-lg shadow-lg space-y-4" x-data="$store.cart">
+  <template x-for="(item, index) in items" :key="index">
+    <div class="cart-item flex items-center gap-4 bg-gray-800 p-3 rounded-md">
+      <img class="w-16 h-16 object-cover rounded" :src="'Menu Kopi Talk 2/' + item.img" :alt="item.name">
 
-        <div class="form-container" x-show="$store.cart.items.length">
-    <form action="" id="checkoutform">
-        <input type="hidden" name="cart_items" x-model="JSON.stringify($store.cart.items)">
-        <input type="hidden" name="cart_total" x-model="$store.cart.total">            
-        <h5>Customer</h5>
+      <div class="item-detail flex-1">
+        <h3 class="text-lg font-semibold" x-text="item.name"></h3>
+        <div class="flex items-center gap-2 text-sm mt-1">
+          <span x-text="rupiah(item.price)"></span> &times;
 
-        <label for="name">
-            <span>Name</span>
-            <input type="text" name="name" placeholder="name" required>
-        </label>
-        <label for="email">
-            <span>Email</span>
-            <input type="email" name="email" placeholder="email" required>
-        </label>
-        <label for="phone">
-            <span>Phone</span>
-            <input type="number" name="phone" placeholder="phone" required>
-        </label>
+          <button @click="remove(item.id)" class="px-2 bg-red-600 hover:bg-red-700 text-white rounded">&minus;</button>
 
-        <!-- Dropdown Metode Pembayaran -->
-        <label for="payment-method">
-            <span>Metode Pembayaran</span>
-            <select id="payment-method" name="payment_method" required>
-                <option value="">Pembayaran</option>
-                <option value="whatsapp">WhatsApp Checkout</option>
-         </select>
-        </label>
+          <span x-text="item.quantity"></span>
 
-        <div class="form-container">
-            <button class="checkout-button disabled" type="submit" id="checkout-button">Checkout</button>
-        </div>            
-    </form>
+          <button @click="add(item)" class="px-2 bg-green-600 hover:bg-green-700 text-white rounded">&plus;</button>
+
+          &equals;
+          <span x-text="rupiah(item.total)"></span>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Cart Status -->
+  <h4 x-show="!items.length" class="text-center text-gray-400">Shopping cart is empty</h4>
+  <h4 x-show="items.length" class="text-right text-xl font-semibold mt-4">
+    Total: <span x-text="rupiah(total)"></span>
+  </h4>
+
+  <!-- Checkout Form -->
+ <div x-data="checkout" class="form-container" x-show="true">
+  <form @submit.prevent="handleCheckout">
+    <input type="hidden" :value="JSON.stringify(cartItems)">
+    <input type="hidden" :value="total">
+
+    <h2 class="text-lg font-bold mb-4">Checkout</h2>
+
+    <label>
+      <span>Nama</span>
+      <input type="text" x-model="name" placeholder="Nama" required>
+    </label>
+
+    <label>
+      <span>Email</span>
+      <input type="email" x-model="email" placeholder="Email" required>
+    </label>
+
+    <label>
+      <span>No. HP</span>
+      <input type="number" x-model="phone" placeholder="08xxxx" required>
+    </label>
+
+    <label>
+      <span>Metode Pembayaran</span>
+      <select x-model="payment_method" required>
+        <option value="">-- Pilih --</option>
+        <option value="whatsapp">WhatsApp Checkout</option>
+        <option value="transfer">Transfer Bank</option>
+        <option value="qris">QRIS</option>
+      </select>
+    </label>
+
+    <template x-if="payment_method === 'cod'">
+      <label>
+        <span>Alamat Pengiriman</span>
+        <textarea x-model="alamat" placeholder="Masukkan alamat lengkap..."></textarea>
+      </label>
+    </template>
+
+    <button type="submit">Checkout Sekarang</button>
+  </form>
+
+  <!-- Output Pembayaran -->
+  <div class="result-box" x-show="showResult">
+    <template x-if="payment_method === 'transfer'">
+      <div>
+        <h3 class="font-bold">Transfer Bank</h3>
+        <p>Silakan transfer ke rekening:</p>
+        <p><strong>Dana: 085714726436 a.n. Fahmi</strong></p>
+      </div>
+    </template>
+
+    <template x-if="payment_method === 'whatsapp'">
+      <div>
+        <h3 class="font-bold">Checkout via WhatsApp</h3>
+        <a :href="whatsappLink" target="_blank" class="text-green-400 underline">Klik untuk kirim via WhatsApp</a>
+      </div>
+    </template>
+  </div>
 </div>
 
-        </nav>
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('checkout', () => ({
+      name: '',
+      email: '',
+      phone: '',
+      alamat: '',
+      payment_method: '',
+      showResult: false,
+
+      cartItems: [
+      ],
+
+      get total() {
+        return this.cartItems.reduce((sum, item) => sum + item.total, 0);
+      },
+
+      get whatsappLink() {
+        const itemList = this.cartItems.map(i => `• ${i.name} (${i.quantity}x) = ${this.formatRupiah(i.total)}`).join('\n');
+        return `https://wa.me/6285714726436?text=${encodeURIComponent(
+          `Halo, saya ingin pesan:\n${itemList}\n\nTotal: ${this.formatRupiah(this.total)}\nNama: ${this.name}\nHP: ${this.phone}`
+        )}`;
+      },
+
+      handleCheckout() {
+        if (!this.name || !this.email || !this.phone || !this.payment_method) {
+          alert('Harap isi semua data');
+          return;
+        }
+
+        this.showResult = true;
+
+        if (this.payment_method === 'whatsapp') {
+          window.open(this.whatsappLink, '_blank');
+        }
+      },
+
+      formatRupiah(value) {
+        return new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR'
+        }).format(value);
+      }
+    }))
+  });
+</script>
+</nav>
         <!--Navbar end-->
 
         <!--hero section start-->
@@ -183,17 +266,6 @@
                 <use href="Feather/feather-sprite.svg#shopping-cart"></use>
               </svg>
               </a>
-            <a href="#" class="item-detail-button">
-                <svg
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <use href="Feather/feather-sprite.svg#eye "></use>
               </svg>
             </a>
         </div>
